@@ -8,9 +8,6 @@ def get_first_node(matrix: np.ndarray, not_been: list, node=0) -> int:
         if matrix[v, node] < m:
             m = matrix[v, node]
             i = v
-    # i = np.argmin(np.delete(matrix[node], [node]))
-    # if i >= node:
-    #     i += 1
     return i
 
 
@@ -64,14 +61,34 @@ def double_greedy_cycle(matrix: np.ndarray, node=0) -> (list, list):
 
     while len(not_been) != 0:
         inx, ci = get_cycle_next_node(matrix, not_been, cycle1)
-        cycle1.insert(ci + 1, not_been[inx])
-        not_been.pop(inx)
+        cycle1.insert(ci + 1, not_been.pop(inx))
 
         if len(not_been) == 0:
             break
         inx, ci = get_cycle_next_node(matrix, not_been, cycle2)
-        cycle2.insert(ci + 1, not_been[inx])
-        not_been.pop(inx)
+        cycle2.insert(ci + 1, not_been.pop(inx))
+
+    cycle1.append(node)
+    cycle2.append(sec_node)
+    return cycle1, cycle2
+
+
+def double_greedy_cycle_seq(matrix: np.ndarray, node=0) -> (list, list):
+    not_been = list(range(len(matrix)))
+    not_been.pop(node)
+    cycle1 = [node, get_first_node(matrix, not_been, node)]
+    not_been.remove(cycle1[-1])
+    half = len(matrix)//2
+
+    while len(not_been) > half:
+        inx, ci = get_cycle_next_node(matrix, not_been, cycle1)
+        cycle1.insert(ci + 1, not_been.pop(inx))
+
+    sec_node = not_been.pop()  # możliwa randomizacja pobieranego wierzchołka
+    cycle2 = [sec_node, get_first_node(matrix, not_been, sec_node)]
+    while len(not_been) != 0:
+        inx, ci = get_cycle_next_node(matrix, not_been, cycle2)
+        cycle2.insert(ci + 1, not_been.pop(inx))
 
     cycle1.append(node)
     cycle2.append(sec_node)

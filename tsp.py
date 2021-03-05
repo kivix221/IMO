@@ -1,4 +1,4 @@
-from utils import load_instance, calc_distance_matrix, plot_result
+from utils import load_instance, calc_distance_matrix, plot_result, get_cycles_distance
 from nn import nn_alg
 from greedy_cycle import *
 
@@ -15,13 +15,30 @@ first_cycle_krob100, second_cycle_krob100 = nn_alg(krob100_distance_matrix)
 # print(first_cycle_kroa100)
 # print(second_cycle_kroa100)
 
+print(get_cycles_distance(kroa100_distance_matrix, first_cycle_kroa100, second_cycle_kroa100))
+print(get_cycles_distance(krob100_distance_matrix, first_cycle_krob100, second_cycle_krob100))
+
 plot_result(kroa100_instance, first_cycle_kroa100, second_cycle_kroa100)
 plot_result(krob100_instance, first_cycle_krob100, second_cycle_krob100)
 
 #    Greedy cycle
 
-first_cycle_kroa100, second_cycle_kroa100 = double_greedy_cycle(kroa100_distance_matrix)
-first_cycle_krob100, second_cycle_krob100 = double_greedy_cycle(krob100_distance_matrix)
+# first_cycle_kroa100, second_cycle_kroa100 = double_greedy_cycle(kroa100_distance_matrix)
+# first_cycle_krob100, second_cycle_krob100 = double_greedy_cycle(krob100_distance_matrix)
+#
+# plot_result(kroa100_instance, first_cycle_kroa100, second_cycle_kroa100)
+# plot_result(krob100_instance, first_cycle_krob100, second_cycle_krob100)
+#
+# print(get_cycles_distance(kroa100_distance_matrix, first_cycle_kroa100, second_cycle_kroa100))
+# print(get_cycles_distance(krob100_distance_matrix, first_cycle_krob100, second_cycle_krob100))
+
+#    Greedy cycle seq
+
+first_cycle_kroa100, second_cycle_kroa100 = double_greedy_cycle_seq(kroa100_distance_matrix)
+first_cycle_krob100, second_cycle_krob100 = double_greedy_cycle_seq(krob100_distance_matrix)
 
 plot_result(kroa100_instance, first_cycle_kroa100, second_cycle_kroa100)
 plot_result(krob100_instance, first_cycle_krob100, second_cycle_krob100)
+
+print(get_cycles_distance(kroa100_distance_matrix, first_cycle_kroa100, second_cycle_kroa100))
+print(get_cycles_distance(krob100_distance_matrix, first_cycle_krob100, second_cycle_krob100))
