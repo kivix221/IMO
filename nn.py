@@ -5,7 +5,7 @@ def nn_alg(distance_matrix):
     first_cycle =  [random.randint(0,99)]
     second_cycle = [random.randint(0,99)]
 
-    while len(first_cycle) <= len(distance_matrix)/2:
+    while len(first_cycle) < len(distance_matrix)/2:
         first_cycle_city = nearest_city(first_cycle + second_cycle, distance_matrix, first_cycle[len(first_cycle) - 1]) 
         first_cycle.append(first_cycle_city) 
      
