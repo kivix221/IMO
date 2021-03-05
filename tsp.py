@@ -42,3 +42,14 @@ plot_result(krob100_instance, first_cycle_krob100, second_cycle_krob100)
 
 print(get_cycles_distance(kroa100_distance_matrix, first_cycle_kroa100, second_cycle_kroa100))
 print(get_cycles_distance(krob100_distance_matrix, first_cycle_krob100, second_cycle_krob100))
+
+#    Regret
+
+first_cycle_kroa100, second_cycle_kroa100 = double_regret_cycle(kroa100_distance_matrix)
+first_cycle_krob100, second_cycle_krob100 = double_regret_cycle(krob100_distance_matrix)
+
+plot_result(kroa100_instance, first_cycle_kroa100, second_cycle_kroa100)
+plot_result(krob100_instance, first_cycle_krob100, second_cycle_krob100)
+
+print(get_cycles_distance(kroa100_distance_matrix, first_cycle_kroa100, second_cycle_kroa100))
+print(get_cycles_distance(krob100_distance_matrix, first_cycle_krob100, second_cycle_krob100))
