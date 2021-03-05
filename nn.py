@@ -1,7 +1,7 @@
 import numpy as np
 import random
 
-def nn_alg(distance_matrix):
+def nn_alg(distance_matrix, node=0):
     first_cycle =  [random.randint(0,99)]
     second_cycle = [random.randint(0,99)]
 
