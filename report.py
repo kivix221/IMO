@@ -1,6 +1,6 @@
 from utils import *
 from nn import nn_alg
-from greedy_cycle import double_regret_cycle, double_regret_cycle2, double_greedy_cycle_seq
+from greedy_cycle import double_regret_cycle, double_regret_cycle2, double_greedy_cycle_seq, double_greedy_cycle1
 
 
 def test_algorithm(matrix, instance, algorithm):
@@ -27,12 +27,14 @@ if __name__ == '__main__':
 
     print("Instancja kroa100")
     print(test_algorithm(kroa100_distance_matrix, kroa100_instance, nn_alg))
-    print(test_algorithm(kroa100_distance_matrix, kroa100_instance, double_greedy_cycle_seq))
+    # print(test_algorithm(kroa100_distance_matrix, kroa100_instance, double_greedy_cycle_seq))
+    print(test_algorithm(kroa100_distance_matrix, kroa100_instance, double_greedy_cycle1))
     print(test_algorithm(kroa100_distance_matrix, kroa100_instance, double_regret_cycle))
-    print(test_algorithm(kroa100_distance_matrix, kroa100_instance, double_regret_cycle2))
+    # print(test_algorithm(kroa100_distance_matrix, kroa100_instance, double_regret_cycle2))
 
     print("Instancja krob100")
     print(test_algorithm(krob100_distance_matrix, krob100_instance, nn_alg))
-    print(test_algorithm(krob100_distance_matrix, krob100_instance, double_greedy_cycle_seq))
+    # print(test_algorithm(krob100_distance_matrix, krob100_instance, double_greedy_cycle_seq))
+    print(test_algorithm(krob100_distance_matrix, krob100_instance, double_greedy_cycle1))
     print(test_algorithm(krob100_distance_matrix, krob100_instance, double_regret_cycle))
-    print(test_algorithm(krob100_distance_matrix, krob100_instance, double_regret_cycle2))
+    # print(test_algorithm(krob100_distance_matrix, krob100_instance, double_regret_cycle2))
