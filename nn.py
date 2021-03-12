@@ -6,34 +6,29 @@ from utils import get_cycle_distance
 def nn_alg(distance_matrix, node = 0):
     not_been = list(range(len(distance_matrix)))
 
-   
     cycle1_current_node = not_been.pop(random.randint(0,99))
-    #drugi losowo
     cycle2_current_node = not_been.pop(random.randint(0,98))
-    
-    #drugi jak najdalej
-    # farest_node = np.where(np.isinf(distance_matrix[cycle1_current_node]),
-    #             -np.inf,distance_matrix[cycle1_current_node]).argmax()
-    # cycle2_current_node = not_been.pop(not_been.index(farest_node))
-                 
+           
     cycle1 = [cycle1_current_node]
     cycle2 = [cycle2_current_node]
 
     while len(not_been) != 0:
-        cycle1_new_node = get_nearest_node(distance_matrix,not_been, cycle1_current_node)
-        cycle1_insert_index =  get_best_insertion(distance_matrix,cycle1,cycle1_new_node)
-        cycle1.insert(cycle1_insert_index,cycle1_new_node)
-        cycle1_current_node = cycle1_new_node
+        cycle1_current_node, cycle1_insert_index  = get_next_node(distance_matrix,not_been,cycle1, cycle1_current_node)
+        cycle1.insert(cycle1_insert_index, cycle1_current_node)
 
-        cycle2_new_node = get_nearest_node(distance_matrix,not_been,cycle2_current_node)
-        cycle2_insert_index = get_best_insertion(distance_matrix,cycle2,cycle2_new_node)
-        cycle2.insert(cycle2_insert_index,cycle2_new_node)
-        cycle2_current_node = cycle2_new_node  
-
+        cycle2_current_node, cycle2_insert_index  = get_next_node(distance_matrix,not_been,cycle2, cycle2_current_node)
+        cycle2.insert(cycle2_insert_index, cycle2_current_node)
+      
     cycle1.append(cycle1[0])
     cycle2.append(cycle2[0])
 
     return cycle1, cycle2
+
+def get_next_node(distance_matrix, not_been,cycle,cycle_current_node):
+    cycle_new_node = get_nearest_node(distance_matrix,not_been, cycle_current_node)
+    cycle_insert_index = get_best_insertion(distance_matrix,cycle,cycle_new_node)
+    
+    return cycle_new_node, cycle_insert_index
 
 
 def get_nearest_node(distance_matrix,not_been, current_node):
@@ -66,3 +61,13 @@ def get_best_insertion(distance_matrix,cycle,new_node):
     return best_insertion
 
 
+##########################
+   # cycle1_new_node = get_nearest_node(distance_matrix,not_been, cycle1_current_node)
+        # cycle1_insert_index =  get_best_insertion(distance_matrix,cycle1,cycle1_new_node)
+        # cycle1.insert(cycle1_insert_index,cycle1_new_node)
+        # cycle1_current_node = cycle1_new_node
+
+        # cycle2_new_node = get_nearest_node(distance_matrix,not_been,cycle2_current_node)
+        # cycle2_insert_index = get_best_insertion(distance_matrix,cycle2,cycle2_new_node)
+        # cycle2.insert(cycle2_insert_index,cycle2_new_node)
+        # cycle2_current_node = cycle2_new_node  
