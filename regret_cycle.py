@@ -44,14 +44,11 @@ def double_regret_cycle(matrix: np.ndarray, node=0) -> (list, list):
     size1 = size2 + len(matrix) % 2
 
     matrix[node, node] = 0
-    # print(matrix[node])
     sec_node = np.argmax(matrix[node])
     matrix[node, node] = np.inf
-    # print(sec_node)
 
     not_been = list(range(len(matrix)))
     not_been.pop(node)
-    # print(not_been)
     not_been.remove(sec_node)
     cycle1 = [node, get_first_node(matrix, not_been, node)]
     not_been.remove(cycle1[-1])
