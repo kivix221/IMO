@@ -1,4 +1,4 @@
-#IMO
+# IMO
 
 ### Metoda najbliższego sąsiada
 [nn.py](./nn.py)
