@@ -37,8 +37,9 @@ def plot_result(instance, first_cycle, second_cycle):
 
     plt.figure()
     plt.scatter(instance[:, 0], instance[:, 1], color='black')
-    plt.plot(first_cycle_to_plot[:, 0], first_cycle_to_plot[:, 1], color='red')
-    plt.plot(second_cycle_to_plot[:, 0], second_cycle_to_plot[:, 1], color='blue')
+    plt.plot(first_cycle_to_plot[:, 0], first_cycle_to_plot[:, 1], color='red', label = 'Cykl 1')
+    plt.plot(second_cycle_to_plot[:, 0], second_cycle_to_plot[:, 1], color='blue', label = 'Cykl 2')
+    plt.legend()
     plt.show()
 
 
