@@ -1,5 +1,8 @@
 # IMO
 
+### Lokalne zachłanne przeszukiwanie
+[greedy_search.py](./greedy_search.py)
+
 ### Metoda najbliższego sąsiada
 [nn.py](./nn.py)
 
