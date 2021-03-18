@@ -1,7 +1,7 @@
 from typing import List, Optional
 
 import numpy as np
-from utils import get_random_cycle, load_instance, get_cycles_distance, calc_distance_matrix
+from ..utils import get_random_cycle, load_instance, get_cycles_distance, calc_distance_matrix
 import time
 from random import randrange, choice
 
