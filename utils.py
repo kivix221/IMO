@@ -3,7 +3,7 @@ import numpy as np
 import math
 from random import shuffle
 
-from typing import List
+from typing import List, Iterable
 
 
 def load_instance(instance_file):
@@ -44,7 +44,7 @@ def plot_result(instance, first_cycle, second_cycle):
     plt.show()
 
 
-def get_cycle_distance(matrix: np.ndarray, cycle: List[int]) -> int:
+def get_cycle_distance(matrix: np.ndarray, cycle: Iterable[int]) -> int:
     distance = 0
     for pr, nx in zip(cycle[:-1], cycle[1:]):
         distance += matrix[pr, nx]
@@ -52,13 +52,13 @@ def get_cycle_distance(matrix: np.ndarray, cycle: List[int]) -> int:
     return int(distance)
 
 
-def get_cycles_distance(matrix: np.ndarray, cycle1: List[int], cycle2: List[int]) -> (int, int, int):
+def get_cycles_distance(matrix: np.ndarray, cycle1: Iterable[int], cycle2: Iterable[int]) -> (int, int, int):
     dis1 = get_cycle_distance(matrix, cycle1)
     dis2 = get_cycle_distance(matrix, cycle2)
     return dis1+dis2, dis1, dis2
 
 
-def get_random_cycle(n=100) -> (List[int], List[int]):
+def get_random_cycle(n=100) -> (Iterable[int], Iterable[int]):
     whole = list(range(n))
     shuffle(whole)
     return np.array(whole[(n//2+1):]), np.array(whole[:(n//2+1)])

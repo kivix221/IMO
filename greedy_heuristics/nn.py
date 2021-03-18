@@ -1,6 +1,6 @@
 import numpy as np
 import random
-from ..utils import get_cycle_distance
+from IMO.utils import get_cycle_distance
 
 
 def nn_alg(distance_matrix, node = 0):

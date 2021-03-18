@@ -1,4 +1,4 @@
-from ..utils import *
+from IMO.utils import *
 from nn import nn_alg
 from greedy_cycle import double_greedy_cycle
 from regret_cycle import double_regret_cycle
@@ -20,8 +20,8 @@ def test_algorithm(matrix, instance, algorithm):
 
 
 if __name__ == '__main__':
-    kroa100_instance = load_instance('../data/kroa100.tsp')
-    krob100_instance = load_instance('../data/krob100.tsp')
+    kroa100_instance = load_instance('data/kroa100.tsp')
+    krob100_instance = load_instance('data/krob100.tsp')
 
     kroa100_distance_matrix = calc_distance_matrix(kroa100_instance)
     krob100_distance_matrix = calc_distance_matrix(krob100_instance)

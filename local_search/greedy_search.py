@@ -1,7 +1,7 @@
 from typing import List, Optional
 
 import numpy as np
-from ..utils import get_random_cycle, load_instance, get_cycles_distance, calc_distance_matrix
+from IMO.utils import get_random_cycle, load_instance, get_cycles_distance, calc_distance_matrix
 import time
 from random import randrange, choice
 
@@ -78,11 +78,13 @@ def greedy_swap_vertices_between_cycle(matrix: np.ndarray, cycle1: np.ndarray, c
     return cycle1, cycle2
 
 
-def greedy_swap_edges_in_cycle(matrix, cycle1, cycle2):
+def greedy_swap_edges_in_cycle(matrix: np.ndarray, cycle1: np.ndarray, cycle2: np.ndarray) -> (
+        List[int], List[int]):
     pass
 
 
-def greedy_swap_edges_between_cycle(matrix, cycle1, cycle2):
+def greedy_swap_edges_between_cycle(matrix: np.ndarray, cycle1: np.ndarray, cycle2: np.ndarray) -> (
+        List[int], List[int]):
     pass
 
 

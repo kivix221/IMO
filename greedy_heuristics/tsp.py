@@ -1,5 +1,5 @@
 from IMO.greedy_heuristics.sandbox import double_greedy_cycle_seq, double_regret_cycle2
-from ..utils import load_instance, calc_distance_matrix, plot_result, get_cycles_distance
+from IMO.utils import load_instance, calc_distance_matrix, plot_result, get_cycles_distance
 from IMO.greedy_heuristics.nn import nn_alg
 from IMO.greedy_heuristics.greedy_cycle import *
  
