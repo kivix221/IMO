@@ -1,5 +1,5 @@
 import numpy as np
-from greedy_cycle import get_first_node, get_cycle_next_node
+from IMO.greedy_heuristics.greedy_cycle import get_first_node, get_cycle_next_node
 
 
 def basic_greedy_cycle(matrix: np.ndarray, node=0) -> list:
