@@ -37,9 +37,9 @@ def plot_result(instance, first_cycle, second_cycle):
     second_cycle_to_plot = np.asfarray([instance[i] for i in second_cycle])
 
     plt.figure()
-    plt.scatter(instance[:, 0], instance[:, 1], color='black')
     plt.plot(first_cycle_to_plot[:, 0], first_cycle_to_plot[:, 1], color='red', label = 'Cykl 1')
     plt.plot(second_cycle_to_plot[:, 0], second_cycle_to_plot[:, 1], color='blue', label = 'Cykl 2')
+    plt.scatter(instance[:, 0], instance[:, 1], color='black')
     plt.legend()
     plt.show()
 
@@ -61,4 +61,12 @@ def get_cycles_distance(matrix: np.ndarray, cycle1: Iterable[int], cycle2: Itera
 def get_random_cycle(n=100) -> (Iterable[int], Iterable[int]):
     whole = list(range(n))
     shuffle(whole)
-    return np.array(whole[(n//2+1):]), np.array(whole[:(n//2+1)])
+    
+    #stara wersja
+    #return np.array(whole[(n//2+1):]), np.array(whole[:(n//2+1)])
+
+    #moja propozycja ~ Marcin
+    cycle1,cycle2 = whole[(n//2):], whole[:(n//2)]
+    cycle1.append(cycle1[0])
+    cycle2.append(cycle2[0])
+    return np.array(cycle1),np.array(cycle2)
