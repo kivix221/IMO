@@ -1,5 +1,5 @@
 import numpy as np
-from greedy_cycle import get_first_node, get_cycle_next_node
+from .greedy_cycle import get_first_node, get_cycle_next_node
 
 
 def get_next_regret_node(matrix: np.ndarray, not_been: list, cycle1: list, cycle2: list) -> (int, int):

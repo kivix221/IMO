@@ -162,3 +162,10 @@ if __name__ == "__main__":
     print("Greedy swap vert between cycles: ", get_cycles_distance(kroa100_distance_matrix, v2_cycle1, v2_cycle2))
     print("Greedy swap vert between cycles: ", duration)
     plot_result(kroa100_instance, v2_cycle1, v2_cycle2)
+
+    duration = time.time()
+    v3_cycle1, v3_cycle2 = steepest_swap_edges_in_cycle(kroa100_distance_matrix, v3_cycle1, v3_cycle2)
+    duration = time.time() - duration
+    print("Greedy swap edges: ", get_cycles_distance(kroa100_distance_matrix, v3_cycle1, v3_cycle2))
+    print("Greedy swap edges: ", duration)
+    plot_result(kroa100_instance, v3_cycle1, v3_cycle2)
