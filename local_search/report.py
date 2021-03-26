@@ -43,17 +43,20 @@ REPEAT = 10
 
 def call_search(matrix, d, cycle1, cycle2, inx=0):
     for name, func in zip(name_func, func_seq):
+        duration = time.time()
         tc1, tc2 = func(matrix, cycle1.copy(), cycle2.copy())
+        duration = time.time() - duration
         t = get_cycles_distance(matrix, tc1, tc2)[0]
         d[name][inx][0] += t
         d[name][inx][1] = min(d[name][0][1], t)
         d[name][inx][2] = max(d[name][0][2], t)
+        d[name][inx][3] += duration
     return d
 
 
 def test_random_start(matrix1, matrix2):
     d = dict()
-    for n in name_func: d[n] = [[0, np.inf, -np.inf], [0, np.inf, -np.inf]]
+    for n in name_func: d[n] = [[0, np.inf, -np.inf, 0.], [0, np.inf, -np.inf, 0.]]
     for _ in range(REPEAT):
         cycle1, cycle2 = get_random_cycle(len(matrix1))
         d = call_search(matrix1, d, cycle1, cycle2)
@@ -64,13 +67,15 @@ def test_random_start(matrix1, matrix2):
     for k in d.keys():
         d[k][0][0] /= REPEAT
         d[k][1][0] /= REPEAT
+        d[k][0][3] /= REPEAT
+        d[k][1][3] /= REPEAT
     res = pd.DataFrame(data=d, index=('kroa100', 'krob100'))
     print(res)
 
 
 def test_heuristic_start(matrix1, matrix2, algorithm):
     d = dict()
-    for n in name_func: d[n] = [[0, np.inf, -np.inf], [0, np.inf, -np.inf]]
+    for n in name_func: d[n] = [[0, np.inf, -np.inf, 0.], [0, np.inf, -np.inf, 0.]]
     for _ in range(REPEAT):
         cycle1, cycle2 = algorithm(matrix1, node=_)
         d = call_search(matrix1, d, cycle1, cycle2)
@@ -81,6 +86,8 @@ def test_heuristic_start(matrix1, matrix2, algorithm):
     for k in d.keys():
         d[k][0][0] /= REPEAT
         d[k][1][0] /= REPEAT
+        d[k][0][3] /= REPEAT
+        d[k][1][3] /= REPEAT
     res = pd.DataFrame(data=d, index=('kroa100', 'krob100'))
     print(res)
 
