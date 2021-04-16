@@ -1,0 +1,1 @@
+# IMO LAB 3 Wykorzystanie ocen ruchów z poprzednich iteracji i ruchów kandydackich w lokalnym przeszukiwaniu
