@@ -3,9 +3,9 @@ try:
     from .steepest_search import *
     from ..greedy_heuristics.regret_cycle import double_regret_cycle
 except Exception:
-    from IMO.local_search.steepest_search import *
-    from IMO.local_search.greedy_search import *
-    from IMO.greedy_heuristics.regret_cycle import double_regret_cycle
+    from steepest_search import *
+    from greedy_search import *
+    from greedy_heuristics.regret_cycle import double_regret_cycle
     
     # 2 podstawowe algorytmy:
 # 1)Zamiana wierzchołków pomiędzy cyklami i w cyklach -- swap_vertices_in_cycle
