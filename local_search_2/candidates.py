@@ -28,15 +28,15 @@ def calculate_candidates(dm: np.ndarray, n: int = 10):
 def is_in_cycle(n: int, cycle1: np.ndarray, cycle2: np.ndarray):
     in_cycle = np.zeros((n,), dtype=np.int32)
     for i, c in enumerate(cycle1[:-1]):
-        in_cycle[c] = i
+        in_cycle[c] = i + 1
     for i, c in enumerate(cycle2[:-1]):
-        in_cycle[c] = -i
+        in_cycle[c] = - i - 1
     return in_cycle
 
 
-def update_in_cycle(in_cycle: np.ndarray, i: int, j: int, cycle: np.ndarray, mul: int):
-    for c in range(i, j + 1):
-        in_cycle[cycle[c]] = mul * c
+def update_in_cycle(in_cycle: np.ndarray, cycle: np.ndarray, mul: int):
+    for i, v in enumerate(cycle[:-1]):
+        in_cycle[v] = mul * (i + 1)
     return in_cycle
 
 
@@ -46,15 +46,27 @@ def steep_candidates(matrix, cycle1, cycle2, candidates, cycle_inx):
         search = False
         s, i, j = search_swap_in_candidates(matrix, cycle1[:-1], cycle2[:-1], candidates, cycle_inx)
         if i is not None or j is not None:
+            # print(s, i, j)
             search = True
             if s:
-                cycle1[i + 1], cycle1[j] = cycle1[j], cycle1[i + 1]
-                cycle1[i + 2:j] = cycle1[i + 2:j][::-1]
-                cycle_inx = update_in_cycle(cycle_inx, i, j, cycle1, cycle_inx[i] // abs(cycle_inx[i]))
+                # cycle1[i + 1], cycle1[j] = cycle1[j], cycle1[i + 1]
+                # cycle1[i + 2:j] = cycle1[i + 2:j][::-1]
+                i, j = min(i, j), max(i, j)
+                # print(cycle1[i - 3:(i + 4) % len(cycle1)], cycle1[j - 3:(j + 4) % len(cycle1)])
+                cycle1[i + 1:j + 1] = cycle1[i + 1:j + 1][::-1]
+                cycle_inx = update_in_cycle(cycle_inx, cycle1, 1)
             else:
                 cycle1[i], cycle2[j] = cycle2[j], cycle1[i]
-                cycle_inx[cycle1[i]] = -i
-                cycle_inx[cycle2[j]] = j
+                # print(cycle_inx[cycle1[i]], cycle_inx[cycle2[j]])
+                cycle_inx[cycle1[i]] = i + 1
+                cycle_inx[cycle2[j]] = -j - 1
+                # print(list(cycle1))
+                # print([''] * i)
+                # print(list(cycle2))
+                # print([''] * j)
+                # print(cycle_inx)
+                # print(cycle_inx[cycle1[i]], cycle_inx[cycle2[j]])
+                # print(cycle1[i - 1:(i + 2) % len(cycle1)], cycle2[j])
 
     search = True
     while search:
@@ -63,13 +75,15 @@ def steep_candidates(matrix, cycle1, cycle2, candidates, cycle_inx):
         if i is not None or j is not None:
             search = True
             if s:
-                cycle2[i + 1], cycle2[j] = cycle2[j], cycle2[i + 1]
-                cycle2[i + 2:j] = cycle2[i + 2:j][::-1]
-                cycle_inx = update_in_cycle(cycle_inx, i, j, cycle2, cycle_inx[i] // abs(cycle_inx[i]))
+                # cycle2[i + 1], cycle2[j] = cycle2[j], cycle2[i + 1]
+                # cycle2[i + 2:j] = cycle2[i + 2:j][::-1]
+                i, j = min(i, j), max(i, j)
+                cycle2[i + 1:j + 1] = cycle2[i + 1:j + 1][::-1]
+                cycle_inx = update_in_cycle(cycle_inx, cycle2, -1)
             else:
                 cycle2[i], cycle1[j] = cycle1[j], cycle2[i]
-                cycle_inx[cycle2[i]] = -i
-                cycle_inx[cycle1[j]] = j
+                cycle_inx[cycle2[i]] = -i - 1
+                cycle_inx[cycle1[j]] = j + 1
 
     cycle1[-1], cycle2[-1] = cycle1[-0], cycle2[0]
     return cycle1, cycle2
@@ -77,42 +91,62 @@ def steep_candidates(matrix, cycle1, cycle2, candidates, cycle_inx):
 
 def search_swap_in_candidates(matrix, cycle1, cycle2, candidates, cycle_inx):
     best_i, best_j = None, None
-    best_d = np.inf
+    best_d = 0
     same_cycle = True
     for i, c1 in enumerate(cycle1):
         for candidate in candidates[c1]:
+            i_can = abs(cycle_inx[candidate]) - 1
             if cycle_inx[candidate] * cycle_inx[c1] >= 0:  # w tym samym cyklu
-                i_can = abs(cycle_inx[candidate])
-                if abs(i_can - i) >= 2:
+                # continue
+                if abs(i_can - i) >= 2 and abs(i_can % (len(cycle1) - 1) - i % (len(cycle1) - 1)) >= 2:
                     con = matrix[c1, candidate]
-                    for i1, i2 in ((i - 1, i_can - 1), ((i + 1) % len(cycle1), (i_can + 1) % len(cycle1))):
-                        d = con + matrix[cycle1[i1], cycle1[i2]] - \
-                            matrix[c1, cycle1[i1]] - matrix[candidate, cycle1[i2]]
+                    # d = con + matrix[cycle1[i-1], cycle1[i_can-1]] - matrix[c1, cycle1[i-1]] - matrix[candidate, cycle1[i_can-1]]
+                    # if d < best_d:
+                    #     same_cycle = True
+                    #     best_d = d
+                    #     best_i, best_j = i-1, i_can-1
+                    # d= con +
+                    for e, (i1, i2) in enumerate(
+                            ((i - 1, i_can - 1), ((i + 1) % len(cycle1), (i_can + 1) % len(cycle1)))):
+                        d = con + matrix[cycle1[i1], cycle1[i2]] - matrix[c1, cycle1[i1]] - matrix[
+                            candidate, cycle1[i2]]
                         if d < best_d:
+                            # print(i, i_can, c1, candidate, cycle1[i1], cycle1[i2])
+                            # print(i, i1, i_can, i2, cycle_inx[c1], cycle_inx[candidate])
                             same_cycle = True
                             best_d = d
-                            best_i, best_j = min(i1, i), min(i2, i_can)
+                            if e == 0:
+                                best_i, best_j = i1, i2
+                            else:
+                                best_i, best_j = i, i_can
 
             else:  # w innym cylku
+                # continue
                 for i1, i2 in ((i - 1, i - 2), ((i + 1) % len(cycle1), (i + 2) % len(cycle1))):
+                    # print(i1, i2)
                     old = matrix[cycle1[i2], cycle1[i1]] + matrix[c1, cycle1[i1]] + \
-                          matrix[candidate, cycle2[abs(cycle_inx[candidate]) - 1]] + \
-                          matrix[candidate, cycle2[(abs(cycle_inx[candidate]) + 1) % len(cycle2)]]
+                          matrix[candidate, cycle2[i_can - 1]] + matrix[candidate, cycle2[(i_can + 1) % len(cycle2)]]
                     new = matrix[cycle1[i2], candidate] + matrix[c1, candidate] + matrix[
-                        cycle1[i1], cycle2[abs(cycle_inx[candidate]) - 1]] + matrix[
-                              cycle1[i1], cycle2[(abs(cycle_inx[candidate]) + 1) % len(cycle2)]]
+                        cycle1[i1], cycle2[i_can - 1]] + matrix[cycle1[i1], cycle2[(i_can + 1) % len(cycle2)]]
                     d = new - old
                     if d < best_d:
+                        # print(i, i_can, c1, candidate, cycle1[i1], cycle2[i2])
+                        # print(i, i1, i_can, i2, cycle_inx[c1], cycle_inx[candidate])
                         same_cycle = False
                         best_d = d
-                        best_i, best_j = i1, abs(cycle_inx[candidate])
+                        best_i, best_j = i1, i_can
+                        if best_i < 0:
+                            best_i = len(cycle1) - 2 - best_i
+                        if best_j < 0:
+                            best_j = len(cycle2) - 2 - best_j
 
+    # print(best_d)
     return same_cycle, best_i, best_j
 
 
 if __name__ == "__main__":
-    ka200_instance = load_instance('../data/kroa100.tsp')
-    kb200_instance = load_instance('../data/krob100.tsp')
+    ka200_instance = load_instance('../data/kroa200.tsp')
+    kb200_instance = load_instance('../data/krob200.tsp')
 
     ka200_dm = calc_distance_matrix(ka200_instance)
     kb200_dm = calc_distance_matrix(kb200_instance)
@@ -128,8 +162,8 @@ if __name__ == "__main__":
 
     ka_cycle1, ka_cycle2 = steep_candidates(ka200_dm, ka_cycle1, ka_cycle2, ka200_can,
                                             is_in_cycle(len(ka200_dm), ka_cycle1, ka_cycle2))
-    print(get_cycles_distance(ka200_dm, ka_cycle1, ka_cycle2))
-
     kb_cycle1, kb_cycle2 = steep_candidates(kb200_dm, kb_cycle1, kb_cycle2, kb200_can,
                                             is_in_cycle(len(kb200_dm), kb_cycle1, kb_cycle2))
+
+    print(get_cycles_distance(ka200_dm, ka_cycle1, ka_cycle2))
     print(get_cycles_distance(kb200_dm, kb_cycle1, kb_cycle2))
