@@ -46,27 +46,15 @@ def steep_candidates(matrix, cycle1, cycle2, candidates, cycle_inx):
         search = False
         s, i, j = search_swap_in_candidates(matrix, cycle1[:-1], cycle2[:-1], candidates, cycle_inx)
         if i is not None or j is not None:
-            # print(s, i, j)
             search = True
             if s:
-                # cycle1[i + 1], cycle1[j] = cycle1[j], cycle1[i + 1]
-                # cycle1[i + 2:j] = cycle1[i + 2:j][::-1]
                 i, j = min(i, j), max(i, j)
-                # print(cycle1[i - 3:(i + 4) % len(cycle1)], cycle1[j - 3:(j + 4) % len(cycle1)])
                 cycle1[i + 1:j + 1] = cycle1[i + 1:j + 1][::-1]
                 cycle_inx = update_in_cycle(cycle_inx, cycle1, 1)
             else:
                 cycle1[i], cycle2[j] = cycle2[j], cycle1[i]
-                # print(cycle_inx[cycle1[i]], cycle_inx[cycle2[j]])
                 cycle_inx[cycle1[i]] = i + 1
                 cycle_inx[cycle2[j]] = -j - 1
-                # print(list(cycle1))
-                # print([''] * i)
-                # print(list(cycle2))
-                # print([''] * j)
-                # print(cycle_inx)
-                # print(cycle_inx[cycle1[i]], cycle_inx[cycle2[j]])
-                # print(cycle1[i - 1:(i + 2) % len(cycle1)], cycle2[j])
 
     search = True
     while search:
@@ -75,8 +63,6 @@ def steep_candidates(matrix, cycle1, cycle2, candidates, cycle_inx):
         if i is not None or j is not None:
             search = True
             if s:
-                # cycle2[i + 1], cycle2[j] = cycle2[j], cycle2[i + 1]
-                # cycle2[i + 2:j] = cycle2[i + 2:j][::-1]
                 i, j = min(i, j), max(i, j)
                 cycle2[i + 1:j + 1] = cycle2[i + 1:j + 1][::-1]
                 cycle_inx = update_in_cycle(cycle_inx, cycle2, -1)
@@ -97,22 +83,13 @@ def search_swap_in_candidates(matrix, cycle1, cycle2, candidates, cycle_inx):
         for candidate in candidates[c1]:
             i_can = abs(cycle_inx[candidate]) - 1
             if cycle_inx[candidate] * cycle_inx[c1] >= 0:  # w tym samym cyklu
-                # continue
                 if abs(i_can - i) >= 2 and abs(i_can % (len(cycle1) - 1) - i % (len(cycle1) - 1)) >= 2:
                     con = matrix[c1, candidate]
-                    # d = con + matrix[cycle1[i-1], cycle1[i_can-1]] - matrix[c1, cycle1[i-1]] - matrix[candidate, cycle1[i_can-1]]
-                    # if d < best_d:
-                    #     same_cycle = True
-                    #     best_d = d
-                    #     best_i, best_j = i-1, i_can-1
-                    # d= con +
                     for e, (i1, i2) in enumerate(
                             ((i - 1, i_can - 1), ((i + 1) % len(cycle1), (i_can + 1) % len(cycle1)))):
                         d = con + matrix[cycle1[i1], cycle1[i2]] - matrix[c1, cycle1[i1]] - matrix[
                             candidate, cycle1[i2]]
                         if d < best_d:
-                            # print(i, i_can, c1, candidate, cycle1[i1], cycle1[i2])
-                            # print(i, i1, i_can, i2, cycle_inx[c1], cycle_inx[candidate])
                             same_cycle = True
                             best_d = d
                             if e == 0:
@@ -121,17 +98,13 @@ def search_swap_in_candidates(matrix, cycle1, cycle2, candidates, cycle_inx):
                                 best_i, best_j = i, i_can
 
             else:  # w innym cylku
-                # continue
                 for i1, i2 in ((i - 1, i - 2), ((i + 1) % len(cycle1), (i + 2) % len(cycle1))):
-                    # print(i1, i2)
                     old = matrix[cycle1[i2], cycle1[i1]] + matrix[c1, cycle1[i1]] + \
                           matrix[candidate, cycle2[i_can - 1]] + matrix[candidate, cycle2[(i_can + 1) % len(cycle2)]]
                     new = matrix[cycle1[i2], candidate] + matrix[c1, candidate] + matrix[
                         cycle1[i1], cycle2[i_can - 1]] + matrix[cycle1[i1], cycle2[(i_can + 1) % len(cycle2)]]
                     d = new - old
                     if d < best_d:
-                        # print(i, i_can, c1, candidate, cycle1[i1], cycle2[i2])
-                        # print(i, i1, i_can, i2, cycle_inx[c1], cycle_inx[candidate])
                         same_cycle = False
                         best_d = d
                         best_i, best_j = i1, i_can
@@ -140,7 +113,6 @@ def search_swap_in_candidates(matrix, cycle1, cycle2, candidates, cycle_inx):
                         if best_j < 0:
                             best_j = len(cycle2) - 2 - best_j
 
-    # print(best_d)
     return same_cycle, best_i, best_j
 
 
@@ -167,3 +139,6 @@ if __name__ == "__main__":
 
     print(get_cycles_distance(ka200_dm, ka_cycle1, ka_cycle2))
     print(get_cycles_distance(kb200_dm, kb_cycle1, kb_cycle2))
+
+    plot_result(ka200_instance, ka_cycle1, ka_cycle2, 'ka200')
+    plot_result(kb200_instance, kb_cycle1, kb_cycle2, 'kb200')
