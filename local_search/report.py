@@ -3,9 +3,9 @@ try:
     from .random_wandering import random_wandering
     from ..utils import *
 except Exception:
-    from IMO.local_search.local_search import *
-    from IMO.local_search.random_wandering import *
-    from IMO.utils import *
+    from local_search import *
+    from random_wandering import *
+    from utils import *
     
 import pandas as pd
 import time
