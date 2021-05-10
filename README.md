@@ -9,4 +9,6 @@
 ### LAB 3
 [Wykorzystanie ocen ruchów z poprzednich iteracji i ruchów kandydackich w lokalnym przeszukiwaniu](local_search_2)
 
+### LAB 4
+[Rozszerzenia lokalnego przeszukiwania](local_search_3/)
 
