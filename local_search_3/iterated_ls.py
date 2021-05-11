@@ -2,6 +2,8 @@ from algo import Algorithm
 from utils import *
 from time import time
 from local_search_2.candidates import calculate_candidates, steep_candidates, is_in_cycle
+from random import randrange
+import numpy as np
 
 
 class Perturbation:
@@ -10,16 +12,54 @@ class Perturbation:
 
 
 class SmallPerturbation(Perturbation):
-    def perturb(self, cycle1, cycle2, matrix, **kwargs):
-        pass
+    def __init__(self, n):
+        self.n = n
+
+    def _swap_vert_inside(self, cycle1, cycle2):
+        if np.random.choice([True, False], 1)[0]:
+            c = cycle1
+        else:
+            c = cycle2
+        s1, s2 = np.random.choice(len(c) - 1, 2, False)
+        c[s1], c[s2] = c[s2], c[s1]
+        c[-1] = c[0]
+        return cycle1, cycle2
+
+    def _swap_vert_between(self, cycle1, cycle2):
+        s1, s2 = np.random.choice(len(cycle1) - 1, 2)
+        cycle1[s1], cycle2[s2] = cycle2[s2], cycle1[s1]
+        cycle1[-1], cycle2[-1] = cycle1[0], cycle2[0]
+        return cycle1, cycle2
+
+    def _swap_edge_inside(self, cycle1, cycle2):
+        if np.random.choice([True, False], 1)[0]:
+            c = cycle1
+        else:
+            c = cycle2
+        s1, s2 = np.random.choice(len(c) - 1, 2, False)
+        while abs(s1 - s2) < 3:
+            s1, s2 = np.random.choice(len(c) - 1, 2, False)
+        s1, s2 = min(s1, s2), max(s1, s2)
+        c[s1:s2 + 1] = c[s1:s2 + 1][::-1]
+        c[-1] = c[0]
+        return cycle1, cycle2
+
+    _swap_func = (_swap_vert_between, _swap_vert_inside, _swap_edge_inside)
+
+    def perturb(self, cycle1, cycle2, matrix, **kwargs) -> (Iterable, Iterable):
+        c1, c2 = np.copy(cycle1), np.copy(cycle2)
+        for _ in range(self.n):
+            c1, c2 = self._swap_func[randrange(len(self._swap_func))](c1, c2)
+        return c1, c2
 
 
 class LargePerturbation(Perturbation):
-    def perturb(self, cycle1, cycle2, matrix, **kwargs):
+    def perturb(self, cycle1, cycle2, matrix, **kwargs) -> (Iterable, Iterable):
         self.destroy(cycle1, matrix)
         self.destroy(cycle2, matrix)
         self.repair(cycle1, matrix)
         self.repair(cycle2, matrix)
+        return cycle1, cycle2
 
     def destroy(self, cycle, matrix):
         pass
