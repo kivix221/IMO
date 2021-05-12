@@ -1,5 +1,5 @@
 import random
-from algo import Algorithm
+from .algo import Algorithm
 from ..utils import *
 from time import time
 from ..local_search_2.candidates import calculate_candidates, steep_candidates, is_in_cycle
@@ -190,8 +190,8 @@ class IteratedLS(IteratedLSa):
 
 
 if __name__ == "__main__":
-    ka200_instance = load_instance('../data/kroa200.tsp')
-    kb200_instance = load_instance('../data/krob200.tsp')
+    ka200_instance = load_instance('IMO/data/kroa200.tsp')
+    kb200_instance = load_instance('IMO/data/krob200.tsp')
 
     ka200_dm = calc_distance_matrix(ka200_instance)
     kb200_dm = calc_distance_matrix(kb200_instance)
