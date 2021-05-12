@@ -68,18 +68,20 @@ def _get_all_perm(one_param, curr_param, keys, ret=None):
 
 def run_tests(algo: Algorithm.__class__, matrix, instance, params):
     algo = algo(matrix)
-    s, t, bc = [], [], []
+    s, t, bc, a = [], [], [], []
     for p in tqdm(params):
         ts, tt, tbc, _ = test_alg(algo, instance=instance, **p)
         s.append(ts)
         t.append(tt)
         bc.append(tbc)
+        a.append(_)
     bsi = np.argmin(np.array(s)[:, 0])
     print(params[bsi])
     print(s[bsi])
     print(t[bsi])
     plot_result(instance, bc[bsi][0], bc[bsi][1], s[bsi][0])
-    plt.savefig('test.jpg')
+    # plt.savefig('test.jpg')
+    return a
 
 
 if __name__ == "__main__":
@@ -100,5 +102,17 @@ if __name__ == "__main__":
     ka200_dm = calc_distance_matrix(ka200_instance)
     kb200_dm = calc_distance_matrix(kb200_instance)
 
-    run_tests(IteratedLS, ka200_dm, ka200_instance, params_sm)
-    run_tests(IteratedLS, ka200_dm, ka200_instance, params_lg)
+    sa = run_tests(IteratedLS, ka200_dm, ka200_instance, params_sm)
+    la = run_tests(IteratedLS, ka200_dm, ka200_instance, params_lg)
+
+    print('=======SMALL========')
+    for a, p in zip(sa, params_sm):
+        print(p)
+        print(a)
+        print()
+    print('=======LARGE========')
+    for a, p in zip(la, params_lg):
+        print(p)
+        print(a)
+        print()
+
