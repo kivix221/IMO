@@ -131,6 +131,9 @@ class IteratedLSa(Algorithm):
         super().__init__(matrix)
         self.candidates = calculate_candidates(matrix)
 
+    def __str__(self):
+        return 'ILSa'
+
     def _run_steep_can(self, cycle1, cycle2):
         return steep_candidates(self.matrix, cycle1, cycle2, self.candidates,
                                 is_in_cycle(self.n, cycle1, cycle2))
@@ -165,6 +168,9 @@ class IteratedLSa(Algorithm):
 
 
 class IteratedLS(IteratedLSa):
+    def __str__(self):
+        return 'ISA'
+
     def run(self, p: Perturbation, size, stop_time=1.5, regret_begin=False, **kwargs):
         t, t_dur = time(), 0.0
 
