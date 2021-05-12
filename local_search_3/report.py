@@ -72,7 +72,7 @@ def run_tests(algo: Algorithm.__class__, matrix, instance, params):
         ts, tt, tbc, _ = test_alg(algo, instance=instance, **p)
     bsi = np.argmin(np.array(s)[:, 0])
     plot_result(instance, bc[bsi][0], bc[bsi][1], s[bsi][0])
-    plt.imsave('test.jpg')
+    plt.savefig('test.jpg')
 
 
 if __name__ == "__main__":

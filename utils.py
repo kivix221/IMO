@@ -36,7 +36,7 @@ def plot_result(instance, first_cycle, second_cycle,instance_title):
     first_cycle_to_plot = np.asfarray([instance[i] for i in first_cycle])
     second_cycle_to_plot = np.asfarray([instance[i] for i in second_cycle])
 
-    # plt.figure()
+    plt.figure()
     plt.plot(first_cycle_to_plot[:, 0], first_cycle_to_plot[:, 1], color='red', label = 'Cykl 1')
     plt.plot(second_cycle_to_plot[:, 0], second_cycle_to_plot[:, 1], color='blue', label = 'Cykl 2')
     plt.scatter(instance[:, 0], instance[:, 1], color='black')
