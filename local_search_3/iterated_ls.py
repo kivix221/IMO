@@ -146,6 +146,8 @@ class IteratedLSa(Algorithm):
         return self._run_steep_can(cycle1, cycle2)
 
     def run(self, p: Perturbation, size, stop_time=1.5, regret_begin=False, **kwargs):
+        iteration = 0
+        found = 0
         t, t_dur = time(), 0.0
 
         if regret_begin:
@@ -155,16 +157,18 @@ class IteratedLSa(Algorithm):
         best_d = get_cycles_distance(self.matrix, best_c1, best_c2)
 
         while t_dur < stop_time:
+            iteration += 1
             nc1, nc2 = p.perturb(best_c1, best_c2, self.matrix, size, **kwargs)
 
             new_d = get_cycles_distance(self.matrix, nc1, nc2)  # MOŻLIWE ULEPSZENIE W WYLICZANIU DYSTANSU
             if new_d < best_d:
+                found += 1
                 best_d = new_d
                 best_c1, best_c2 = nc1, nc2
 
             t_dur = time() - t
 
-        return (best_c1, best_c2), None
+        return (best_c1, best_c2), (found, iteration)
 
 
 class IteratedLS(IteratedLSa):
@@ -172,6 +176,8 @@ class IteratedLS(IteratedLSa):
         return 'ISA'
 
     def run(self, p: Perturbation, size, stop_time=1.5, regret_begin=False, **kwargs):
+        iteration = 0
+        found = 0
         t, t_dur = time(), 0.0
 
         if regret_begin:
@@ -181,18 +187,20 @@ class IteratedLS(IteratedLSa):
         best_d = get_cycles_distance(self.matrix, best_c1, best_c2)
 
         while t_dur < stop_time:
+            iteration += 1
             nc1, nc2 = p.perturb(best_c1, best_c2, self.matrix, size, **kwargs)
 
             nc1, nc2 = self._run_steep_can(nc1, nc2)
 
             new_d = get_cycles_distance(self.matrix, nc1, nc2)  # MOŻLIWE ULEPSZENIE W WYLICZANIU DYSTANSU
             if new_d < best_d:
+                found += 1
                 best_d = new_d
                 best_c1, best_c2 = nc1, nc2
 
             t_dur = time() - t
 
-        return (best_c1, best_c2), None
+        return (best_c1, best_c2), (found, iteration)
 
 
 if __name__ == "__main__":

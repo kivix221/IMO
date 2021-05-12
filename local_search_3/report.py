@@ -3,9 +3,10 @@ import copy
 import matplotlib.pyplot as plt
 import numpy as np
 from .iterated_ls import *
+from tqdm import tqdm
 
 ITER = 10
-MSLS_MEAN_TIME = 15
+MSLS_MEAN_TIME = 100
 
 
 def calc_triple(tab):
@@ -68,8 +69,11 @@ def _get_all_perm(one_param, curr_param, keys, ret=None):
 def run_tests(algo: Algorithm.__class__, matrix, instance, params):
     algo = algo(matrix)
     s, t, bc = [], [], []
-    for p in params:
+    for p in tqdm(params):
         ts, tt, tbc, _ = test_alg(algo, instance=instance, **p)
+        s.append(ts)
+        t.append(tt)
+        bc.append(tbc)
     bsi = np.argmin(np.array(s)[:, 0])
     print(params[bsi])
     print(s[bsi])
@@ -84,9 +88,10 @@ if __name__ == "__main__":
     params_sm = {'p': (sm_perturb,), 'size': np.arange(5, 21, 5), 'stop_time': (MSLS_MEAN_TIME,)}
     params_lg = {'p': (lg_perturb,), 'size': np.arange(0.05, 0.31, 0.05), 'rand': np.arange(0.0, 1.1, 0.2),
                  'stop_time': (MSLS_MEAN_TIME,)}
-    params = generate_params((params_lg, params_sm))
-    print(params)
-    print(len(params))
+    params_sm = generate_params((params_sm,))
+    params_lg = generate_params((params_lg,))
+    # print(params)
+    # print(len(params))
     # print(next(params))
 
     ka200_instance = load_instance('IMO/data/kroa200.tsp')
@@ -95,4 +100,5 @@ if __name__ == "__main__":
     ka200_dm = calc_distance_matrix(ka200_instance)
     kb200_dm = calc_distance_matrix(kb200_instance)
 
-    run_tests(IteratedLS, ka200_dm, ka200_instance, params)
+    run_tests(IteratedLS, ka200_dm, ka200_instance, params_sm)
+    run_tests(IteratedLS, ka200_dm, ka200_instance, params_lg)
