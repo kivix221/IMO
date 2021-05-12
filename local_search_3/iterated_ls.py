@@ -164,7 +164,7 @@ class IteratedLSa(Algorithm):
 
             t_dur = time() - t
 
-        return best_c1, best_c2
+        return (best_c1, best_c2), None
 
 
 class IteratedLS(IteratedLSa):
@@ -192,7 +192,7 @@ class IteratedLS(IteratedLSa):
 
             t_dur = time() - t
 
-        return best_c1, best_c2
+        return (best_c1, best_c2), None
 
 
 if __name__ == "__main__":

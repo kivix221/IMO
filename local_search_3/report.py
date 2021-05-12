@@ -71,6 +71,9 @@ def run_tests(algo: Algorithm.__class__, matrix, instance, params):
     for p in params:
         ts, tt, tbc, _ = test_alg(algo, instance=instance, **p)
     bsi = np.argmin(np.array(s)[:, 0])
+    print(params[bsi])
+    print(s[bsi])
+    print(t[bsi])
     plot_result(instance, bc[bsi][0], bc[bsi][1], s[bsi][0])
     plt.savefig('test.jpg')
 
