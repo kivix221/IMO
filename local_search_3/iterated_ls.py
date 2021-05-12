@@ -1,11 +1,10 @@
 import random
-
 from algo import Algorithm
-from utils import *
+from ..utils import *
 from time import time
-from local_search_2.candidates import calculate_candidates, steep_candidates, is_in_cycle
+from ..local_search_2.candidates import calculate_candidates, steep_candidates, is_in_cycle
 from random import randrange
-from greedy_heuristics.regret_cycle import get_next_regret_node, get_cycle_next_node, double_regret_cycle
+from ..greedy_heuristics.regret_cycle import get_next_regret_node, get_cycle_next_node, double_regret_cycle
 import numpy as np
 
 
