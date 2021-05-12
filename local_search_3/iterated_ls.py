@@ -1,9 +1,11 @@
+import random
+
 from algo import Algorithm
 from utils import *
 from time import time
 from local_search_2.candidates import calculate_candidates, steep_candidates, is_in_cycle
 from random import randrange
-from greedy_heuristics.regret_cycle import get_next_regret_node, get_cycle_next_node
+from greedy_heuristics.regret_cycle import get_next_regret_node, get_cycle_next_node, double_regret_cycle
 import numpy as np
 
 
@@ -58,6 +60,8 @@ class SmallPerturbation(Perturbation):
 class LargePerturbation(Perturbation):
     def perturb(self, cycle1, cycle2, matrix, size, instance=None, rand=0.0, **kwargs) -> (Iterable, Iterable):
         assert instance is not None
+        assert 0.0 <= size <= 1.0
+        assert 0.0 <= rand <= 1.0
         c1, c2 = super(LargePerturbation, self).perturb(cycle1, cycle2, matrix, size)
 
         middles = self._calculate_middles(c1, c2, instance)
@@ -67,29 +71,29 @@ class LargePerturbation(Perturbation):
         return c1, c2
 
     def _calculate_middles(self, cycle1, cycle2, instance):
-        m1 = np.mean(np.choose(cycle1[:-1] - 1, instance), axis=0)
-        m2 = np.mean(np.choose(cycle2[:-1] - 1, instance), axis=0)
+        m1 = np.mean(instance[cycle1[:-1] - 1], axis=0)
+        m2 = np.mean(instance[cycle2[:-1] - 1], axis=0)
         return m1, m2
 
     def destroy(self, cycle1, cycle2, size, rand, instance, middles):
         removed = np.array([], dtype=np.int32)
 
-        d1 = np.sum((np.choose(cycle1[:-1] - 1, instance) - middles[0]) ** 2, axis=1)
-        d2 = np.sum((np.choose(cycle2[:-1] - 1, instance) - middles[1]) ** 2, axis=1)
+        d1 = np.sum((instance[cycle1[:-1] - 1] - middles[0]) ** 2, axis=1)
+        d2 = np.sum((instance[cycle2[:-1] - 1] - middles[1]) ** 2, axis=1)
         d1 = np.stack([d1, np.arange(d1.shape[0])], axis=-1)
         d2 = np.stack([d2, np.arange(d2.shape[0])], axis=-1)
-        d1 = sorted(d1, key=lambda x: x[0], reverse=True)
-        d2 = sorted(d2, key=lambda x: x[0], reverse=True)
+        d1 = np.array(sorted(d1, key=lambda x: x[0], reverse=True), dtype=int)
+        d2 = np.array(sorted(d2, key=lambda x: x[0], reverse=True), dtype=int)
 
         qn = int(size * (1. - rand) * instance.shape[0])  # wyrzucanie wierzchołków najdalszych od środków
-        removed = np.concatenate([removed, np.choose(d1[:qn // 2, 1], cycle1), np.choose(d2[:qn // 2, 1], cycle2)])
+        removed = np.concatenate([removed, cycle1[d1[:qn // 2, 1]], cycle2[d2[:qn // 2, 1]]], axis=0)
         cycle1 = np.delete(cycle1, d1[:qn // 2, 1])
         cycle2 = np.delete(cycle2, d2[:qn // 2, 1])
 
         qn = int(size * rand * instance.shape[0])  # wyrzucanie losowych wierzchołków
         to_rem1 = np.random.choice(cycle1.shape[0] - 1, qn // 2, False)
         to_rem2 = np.random.choice(cycle2.shape[0] - 1, qn // 2, False)
-        removed = np.concatenate([removed, np.choose(to_rem1, cycle1), np.choose(to_rem2, cycle2)])
+        removed = np.concatenate([removed, cycle1[to_rem1], cycle2[to_rem2]], axis=0)
         cycle1 = np.delete(cycle1, to_rem1)
         cycle2 = np.delete(cycle2, to_rem2)
 
@@ -132,12 +136,20 @@ class IteratedLSa(Algorithm):
         return steep_candidates(self.matrix, cycle1, cycle2, self.candidates,
                                 is_in_cycle(self.n, cycle1, cycle2))
 
-    def run(self, p: Perturbation, size, stop_time=1.5, **kwargs):
+    def _regret_begin(self):
+        return double_regret_cycle(self.matrix, random.randrange(self.n))
+
+    def _ls_begin(self):
+        cycle1, cycle2 = get_random_cycle(self.n)
+        return self._run_steep_can(cycle1, cycle2)
+
+    def run(self, p: Perturbation, size, stop_time=1.5, regret_begin=False, **kwargs):
         t, t_dur = time(), 0.0
 
-        cycle1, cycle2 = get_random_cycle(self.n)
-
-        best_c1, best_c2 = self._run_steep_can(cycle1, cycle2)
+        if regret_begin:
+            best_c1, best_c2 = self._regret_begin()
+        else:
+            best_c1, best_c2 = self._ls_begin()
         best_d = get_cycles_distance(self.matrix, best_c1, best_c2)
 
         while t_dur < stop_time:
@@ -154,12 +166,13 @@ class IteratedLSa(Algorithm):
 
 
 class IteratedLS(IteratedLSa):
-    def run(self, p: Perturbation, size, stop_time=1.5, **kwargs):
+    def run(self, p: Perturbation, size, stop_time=1.5, regret_begin=False, **kwargs):
         t, t_dur = time(), 0.0
 
-        cycle1, cycle2 = get_random_cycle(self.n)
-
-        best_c1, best_c2 = self._run_steep_can(cycle1, cycle2)
+        if regret_begin:
+            best_c1, best_c2 = self._regret_begin()
+        else:
+            best_c1, best_c2 = self._ls_begin()
         best_d = get_cycles_distance(self.matrix, best_c1, best_c2)
 
         while t_dur < stop_time:
@@ -186,7 +199,8 @@ if __name__ == "__main__":
 
     it = IteratedLS(kb200_dm)
     s_per = SmallPerturbation()
-    cy1, cy2 = it.run(s_per, stop_time=15, size=15)
+    l_per = LargePerturbation()
+    cy1, cy2 = it.run(l_per, stop_time=15, size=0.2, rand=1.0, instance=kb200_instance)
 
     dist = get_cycles_distance(kb200_dm, cy1, cy2)
     print(get_cycles_distance(kb200_dm, cy1, cy2))
