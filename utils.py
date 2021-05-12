@@ -42,7 +42,7 @@ def plot_result(instance, first_cycle, second_cycle,instance_title):
     plt.plot(second_cycle_to_plot[:, 0], second_cycle_to_plot[:, 1], color='blue', label = 'Cykl 2')
     plt.scatter(instance[:, 0], instance[:, 1], color='black')
     plt.legend()
-    plt.show()
+    # plt.show()
 
 
 def get_cycle_distance(matrix: np.ndarray, cycle: Iterable[int]) -> int:
