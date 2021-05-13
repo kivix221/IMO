@@ -39,7 +39,7 @@ def test_alg(algo: Algorithm, **kwargs):
     scores = np.zeros((ITER,), dtype=np.float32)
     times = np.zeros((ITER,), dtype=np.float32)
     adds = np.zeros((ITER, 2), dtype=np.float32)
-    cycles = np.zeros((ITER, 2, 101), dtype=np.float32)
+    cycles = np.zeros((ITER, 2, 51), dtype=np.float32)
 
     r = [_test_alg_par.remote(_, algo, kwargs) for _ in range(ITER)]
     r = ray.get(r)
