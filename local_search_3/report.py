@@ -124,8 +124,8 @@ if __name__ == "__main__":
     # print(len(params))
     # print(next(params))
 
-    ka200_instance = load_instance('../data/kroa100.tsp')
-    kb200_instance = load_instance('../data/krob100.tsp')
+    ka200_instance = load_instance('IMO/data/kroa100.tsp')
+    kb200_instance = load_instance('IMO/data/krob100.tsp')
 
     ka200_dm = calc_distance_matrix(ka200_instance)
     kb200_dm = calc_distance_matrix(kb200_instance)
