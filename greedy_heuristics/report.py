@@ -1,4 +1,4 @@
-from IMO.utils import *
+from utils import *
 from nn import nn_alg
 from greedy_cycle import double_greedy_cycle
 from regret_cycle import double_regret_cycle

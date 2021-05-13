@@ -1,11 +1,17 @@
 import random
-from .algo import Algorithm
-from ..utils import *
 from time import time
-from ..local_search_2.candidates import calculate_candidates, steep_candidates, is_in_cycle
 from random import randrange
-from ..greedy_heuristics.regret_cycle import get_next_regret_node, get_cycle_next_node, double_regret_cycle
 import numpy as np
+try:
+    from .algo import Algorithm
+    from ..utils import *
+    from ..local_search_2.candidates import calculate_candidates, steep_candidates, is_in_cycle
+    from ..greedy_heuristics.regret_cycle import get_next_regret_node, get_cycle_next_node, double_regret_cycle
+except Exception:
+    from algo import Algorithm
+    from utils import *
+    from local_search_2.candidates import calculate_candidates, steep_candidates, is_in_cycle
+    from greedy_heuristics.regret_cycle import get_next_regret_node, get_cycle_next_node, double_regret_cycle
 
 
 class Perturbation:
@@ -69,12 +75,14 @@ class LargePerturbation(Perturbation):
         c1, c2 = self.repair(c1, c2, matrix, removed)
         return c1, c2
 
-    def _calculate_middles(self, cycle1, cycle2, instance):
+    @staticmethod
+    def _calculate_middles(cycle1, cycle2, instance):
         m1 = np.mean(instance[cycle1[:-1] - 1], axis=0)
         m2 = np.mean(instance[cycle2[:-1] - 1], axis=0)
         return m1, m2
 
-    def destroy(self, cycle1, cycle2, size, rand, instance, middles):
+    @staticmethod
+    def destroy(cycle1, cycle2, size, rand, instance, middles):
         removed = np.array([], dtype=np.int32)
 
         d1 = np.sum((instance[cycle1[:-1] - 1] - middles[0]) ** 2, axis=1)
@@ -98,7 +106,8 @@ class LargePerturbation(Perturbation):
 
         return cycle1, cycle2, removed
 
-    def repair(self, cycle1, cycle2, matrix, removed):
+    @staticmethod
+    def repair(cycle1, cycle2, matrix, removed):
         s2 = matrix.shape[0] // 2
         s1 = s2 + matrix.shape[0] % 2
 

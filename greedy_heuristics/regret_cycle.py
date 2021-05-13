@@ -43,6 +43,8 @@ def double_regret_cycle(matrix: np.ndarray, node=0) -> (list, list):
     size2 = len(matrix) // 2
     size1 = size2 + len(matrix) % 2
 
+    matrix = np.copy(matrix)
+
     matrix[node, node] = 0
     sec_node = np.argmax(matrix[node])
     matrix[node, node] = np.inf
