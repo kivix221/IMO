@@ -1,7 +1,6 @@
 import random
 from time import time
 from random import randrange
-import numpy as np
 try:
     from .algo import Algorithm
     from ..utils import *
@@ -182,7 +181,7 @@ class IteratedLSa(Algorithm):
 
 class IteratedLS(IteratedLSa):
     def __str__(self):
-        return 'ISA'
+        return 'ILS'
 
     def run(self, p: Perturbation, size, stop_time=1.5, regret_begin=False, **kwargs):
         iteration = 0

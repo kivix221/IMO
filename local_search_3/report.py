@@ -1,18 +1,13 @@
 import copy
-
-import matplotlib.pyplot as plt
-import numpy as np
-
 try:
     from .iterated_ls import *
 except Exception:
     from local_search_3.iterated_ls import *
 from tqdm import tqdm
-# import multiprocessing as mp
 import ray
 
 ITER = 10
-MSLS_MEAN_TIME = 25
+MSLS_MEAN_TIME = 2.5
 
 
 def calc_triple(tab):
@@ -111,35 +106,105 @@ def run_tests(algo: Algorithm.__class__, matrix, instance, params):
     return a
 
 
+def run_report(algo: Algorithm.__class__, matrix, instance, params):
+    algo = algo(matrix)
+    params['instance'] = instance
+    s, t, bc = [], [], []
+    for i in tqdm(range(ITER)):
+        st = time()
+        (c1, c2), _ = algo.run(**params)
+        st = time() - st
+        s.append(get_cycles_distance(matrix, c1, c2)[0])
+        t.append(st)
+        bc.append((c1, c2))
+    best_c = bc[np.argmin(s)]
+    trip_s = calc_triple(s)
+    trip_t = calc_triple(t)
+    return trip_s, trip_t, best_c
+
+
+def triple_to_string(trip, to_int=True):
+    if to_int:
+        return f"{int(trip[0])} ({int(trip[1])} - {int(trip[2])})"
+    else:
+        return f"%.3f (%.3f - %.3f)" % (trip[0], trip[1], trip[2])
+
+
+krox = {0: 'kroa200-', 1: 'krob200-'}
+
+
+def test_report_wrapper(results, names, algorithms, matrices, instances, params):
+    for i, (matrix, instance) in enumerate(zip(matrices, instances)):
+        for name, algo, param in zip(names, algorithms, params):
+            s, t, c = run_report(algo, matrix, instance, param)
+            results['score'][i].append(triple_to_string(s))
+            results['time'][i].append(triple_to_string(t, False))
+            plot_result(instance, c[0], c[1], krox[i] + str(algo([])))
+
+    return results
+
+
+def print_results(results, names):
+    print('======SCORES======')
+    print('    \t                 KROA |                  KROB')
+    [print("%s\t%s | %s" % (n, s1, s2)) for n, s1, s2 in zip(names, results['score'][0], results['score'][1])]
+    print('======TIMES======')
+    print('    \t                 KROA |                  KROB')
+    [print("%s\t%s | %s" % (n, s1, s2)) for n, s1, s2 in zip(names, results['time'][0], results['time'][1])]
+
+
 if __name__ == "__main__":
-    ray.init()
-    sm_perturb = SmallPerturbation()
-    lg_perturb = LargePerturbation()
-    params_sm = {'p': (sm_perturb,), 'size': np.arange(5, 21, 5), 'stop_time': (MSLS_MEAN_TIME,)}
-    params_lg = {'p': (lg_perturb,), 'size': np.arange(0.06, 0.31, 0.08), 'rand': np.arange(0.0, 1.1, 0.33),
-                 'stop_time': (MSLS_MEAN_TIME,), 'regret_begin': (True, False)}
-    params_sm = generate_params((params_sm,))
-    params_lg = generate_params((params_lg,))
+    # GRID SEARCH
+    # ray.init()
+    # sm_perturb = SmallPerturbation()
+    # lg_perturb = LargePerturbation()
+    # params_sm = {'p': (sm_perturb,), 'size': np.arange(5, 21, 5), 'stop_time': (MSLS_MEAN_TIME,)}
+    # params_lg = {'p': (lg_perturb,), 'size': np.arange(0.06, 0.31, 0.08), 'rand': np.arange(0.0, 1.1, 0.33),
+    #              'stop_time': (MSLS_MEAN_TIME,), 'regret_begin': (True, False)}
+    # params_sm = generate_params((params_sm,))
+    # params_lg = generate_params((params_lg,))
     # print(params)
     # print(len(params))
     # print(next(params))
 
-    ka200_instance = load_instance('IMO/data/kroa100.tsp')
-    kb200_instance = load_instance('IMO/data/krob100.tsp')
-
-    ka200_dm = calc_distance_matrix(ka200_instance)
-    kb200_dm = calc_distance_matrix(kb200_instance)
+    # ka200_instance = load_instance('IMO/data/kroa100.tsp')
+    # kb200_instance = load_instance('IMO/data/krob100.tsp')
+    #
+    # ka200_dm = calc_distance_matrix(ka200_instance)
+    # kb200_dm = calc_distance_matrix(kb200_instance)
 
     # sa = run_tests(IteratedLS, ka200_dm, ka200_instance, params_sm)
-    la = run_tests(IteratedLSa, ka200_dm, ka200_instance, params_lg)
+    # la = run_tests(IteratedLSa, ka200_dm, ka200_instance, params_lg)
 
     # print('=======SMALL========')
     # for a, p in zip(sa, params_sm):
     #     print(p)
     #     print(a)
     #     print()
-    print('=======LARGE========')
-    for a, p in zip(la, params_lg):
-        print(p)
-        print(a)
-        print()
+    # print('=======LARGE========')
+    # for a, p in zip(la, params_lg):
+    #     print(p)
+    #     print(a)
+    #     print()
+
+    ka200_instance = load_instance('../data/kroa200.tsp')
+    kb200_instance = load_instance('../data/krob200.tsp')
+
+    ka200_dm = calc_distance_matrix(ka200_instance)
+    kb200_dm = calc_distance_matrix(kb200_instance)
+
+    results = {'score': ([None], [None]), 'time': ([None], [None])}
+    # Zamiast None trzeba wrzucić wyniki z MSLS i ustawić MSLS_MEAN_TIME na średni czas wykonywania
+
+    str_alg = ('MSLS', 'ILS1', 'ILS2', 'ILS2a')
+    sm_perturb = SmallPerturbation()
+    lg_perturb = LargePerturbation()
+    params_sm = {'p': sm_perturb, 'size': 5, 'stop_time': MSLS_MEAN_TIME}
+    params_lg = {'p': lg_perturb, 'size': 0.3, 'rand': 0.6,
+                 'stop_time': MSLS_MEAN_TIME, 'regret_begin': True}
+    params_lga = {'p': lg_perturb, 'size': 0.3, 'rand': 0.99,
+                  'stop_time': MSLS_MEAN_TIME, 'regret_begin': True}
+
+    results = test_report_wrapper(results, str_alg[1:], [IteratedLS, IteratedLS, IteratedLSa], [ka200_dm, kb200_dm],
+                                  [ka200_instance, kb200_instance], [params_sm, params_lg, params_lga])
+    print_results(results, str_alg)
