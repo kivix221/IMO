@@ -116,7 +116,7 @@ if __name__ == "__main__":
     sm_perturb = SmallPerturbation()
     lg_perturb = LargePerturbation()
     params_sm = {'p': (sm_perturb,), 'size': np.arange(5, 21, 5), 'stop_time': (MSLS_MEAN_TIME,)}
-    params_lg = {'p': (lg_perturb,), 'size': np.arange(0.05, 0.31, 0.05), 'rand': np.arange(0.0, 1.1, 0.2),
+    params_lg = {'p': (lg_perturb,), 'size': np.arange(0.06, 0.31, 0.08), 'rand': np.arange(0.0, 1.1, 0.33),
                  'stop_time': (MSLS_MEAN_TIME,), 'regret_begin': (True, False)}
     params_sm = generate_params((params_sm,))
     params_lg = generate_params((params_lg,))
@@ -131,7 +131,7 @@ if __name__ == "__main__":
     kb200_dm = calc_distance_matrix(kb200_instance)
 
     # sa = run_tests(IteratedLS, ka200_dm, ka200_instance, params_sm)
-    la = run_tests(IteratedLS, ka200_dm, ka200_instance, params_lg)
+    la = run_tests(IteratedLSa, ka200_dm, ka200_instance, params_lg)
 
     # print('=======SMALL========')
     # for a, p in zip(sa, params_sm):
