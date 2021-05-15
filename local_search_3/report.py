@@ -4,10 +4,10 @@ try:
 except Exception:
     from local_search_3.iterated_ls import *
 from tqdm import tqdm
-import ray
+# import ray  # pip install ray[default]
 
 ITER = 10
-MSLS_MEAN_TIME = 2.5
+MSLS_MEAN_TIME = 50
 
 
 def calc_triple(tab):
@@ -158,7 +158,8 @@ if __name__ == "__main__":
     # ray.init()
     # sm_perturb = SmallPerturbation()
     # lg_perturb = LargePerturbation()
-    # params_sm = {'p': (sm_perturb,), 'size': np.arange(5, 21, 5), 'stop_time': (MSLS_MEAN_TIME,)}
+    # params_sm = {'p': (sm_perturb,), 'size': np.arange(5, 21, 5), 'stop_time': (MSLS_MEAN_TIME,),
+    #              'regret_begin': (True, False)}
     # params_lg = {'p': (lg_perturb,), 'size': np.arange(0.06, 0.31, 0.08), 'rand': np.arange(0.0, 1.1, 0.33),
     #              'stop_time': (MSLS_MEAN_TIME,), 'regret_begin': (True, False)}
     # params_sm = generate_params((params_sm,))
@@ -167,9 +168,9 @@ if __name__ == "__main__":
     # print(len(params))
     # print(next(params))
 
-    # ka200_instance = load_instance('IMO/data/kroa100.tsp')
-    # kb200_instance = load_instance('IMO/data/krob100.tsp')
-    #
+    # ka200_instance = load_instance('../data/kroa100.tsp')
+    # kb200_instance = load_instance('../data/krob100.tsp')
+
     # ka200_dm = calc_distance_matrix(ka200_instance)
     # kb200_dm = calc_distance_matrix(kb200_instance)
 
@@ -199,7 +200,7 @@ if __name__ == "__main__":
     str_alg = ('MSLS', 'ILS1', 'ILS2', 'ILS2a')
     sm_perturb = SmallPerturbation()
     lg_perturb = LargePerturbation()
-    params_sm = {'p': sm_perturb, 'size': 5, 'stop_time': MSLS_MEAN_TIME}
+    params_sm = {'p': sm_perturb, 'size': 10, 'stop_time': MSLS_MEAN_TIME, 'regret_begin': True}
     params_lg = {'p': lg_perturb, 'size': 0.3, 'rand': 0.6,
                  'stop_time': MSLS_MEAN_TIME, 'regret_begin': True}
     params_lga = {'p': lg_perturb, 'size': 0.3, 'rand': 0.99,
