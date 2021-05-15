@@ -14,7 +14,7 @@ def calc_triple(tab):
     return np.mean(tab), np.min(tab), np.max(tab)
 
 
-@ray.remote
+# @ray.remote
 def _test_alg_par(_, algo: Algorithm, kwargs):
     st = time()
     (c1, c2), a = algo.run(**kwargs)
@@ -37,7 +37,7 @@ def test_alg(algo: Algorithm, **kwargs):
     cycles = np.zeros((ITER, 2, 51), dtype=np.float32)
 
     r = [_test_alg_par.remote(_, algo, kwargs) for _ in range(ITER)]
-    r = ray.get(r)
+    # r = ray.get(r)
 
     for i, ((c1, c2), st, sd, a) in enumerate(r):
         cycles[i][0] = c1
