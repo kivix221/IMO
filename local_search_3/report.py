@@ -1,4 +1,9 @@
+from utils import *
+from local_search_3.algo import Algorithm
+import time 
+from local_search_3.multiple_start_ls import multiple_start_local_search
 import copy
+import pandas as pd
 try:
     from .iterated_ls import *
 except Exception:
@@ -7,7 +12,7 @@ from tqdm import tqdm
 # import ray  # pip install ray[default]
 
 ITER = 10
-MSLS_MEAN_TIME = 50
+MSLS_MEAN_TIME = 514.62
 
 
 def calc_triple(tab):
@@ -130,7 +135,7 @@ def triple_to_string(trip, to_int=True):
         return f"%.3f (%.3f - %.3f)" % (trip[0], trip[1], trip[2])
 
 
-krox = {0: 'kroa200-', 1: 'krob200-'}
+krox = {0: 'krob200-', 1: 'kroa200-'}
 
 
 def test_report_wrapper(results, names, algorithms, matrices, instances, params):
@@ -139,7 +144,11 @@ def test_report_wrapper(results, names, algorithms, matrices, instances, params)
             s, t, c = run_report(algo, matrix, instance, param)
             results['score'][i].append(triple_to_string(s))
             results['time'][i].append(triple_to_string(t, False))
-            plot_result(instance, c[0], c[1], krox[i] + str(algo([])))
+            plot_result(instance, c[0], c[1], krox[i] + name)
+            
+            print(results['score'][i])
+            print( results['time'][i])
+            
 
     return results
 
@@ -152,7 +161,56 @@ def print_results(results, names):
     print('    \t                 KROA |                  KROB')
     [print("%s\t%s | %s" % (n, s1, s2)) for n, s1, s2 in zip(names, results['time'][0], results['time'][1])]
 
+def call_search(matrix, d, cycle1, cycle2, inx=0):    
+    duration = time()
+    tc1, tc2 = multiple_start_local_search(matrix)
+    duration = time() - duration
+    t = get_cycles_distance(matrix, tc1, tc2)[0]
+    d["MSLS"][inx][0] += t
+    d["MSLS"][inx][1] = min(d["MSLS"][inx][1], t)
+    d["MSLS"][inx][2] = max(d["MSLS"][inx][2], t)
+    d["MSLS"][inx][3] += duration
+    d["MSLS"][inx][4] = min(d["MSLS"][inx][4],duration)
+    d["MSLS"][inx][5] = max(d["MSLS"][inx][5],duration)
+    
+    if d["MSLS"][inx][1] == t:
+        d["MSLS"][inx][6] = tc1,tc2 
+                
+    return d
 
+
+def test_random_start(instance1,instance2,matrix1, matrix2):
+    d = dict()
+    d["MSLS"] = [[0, np.inf, -np.inf, 0., np.inf, -np.inf, (None,None)],\
+        [0, np.inf, -np.inf, 0., np.inf, -np.inf,(None,None)]]
+    for _ in range(ITER):
+        cycle1, cycle2 = get_random_cycle(len(matrix1)) #
+        d = call_search(matrix1, d, cycle1, cycle2,0)
+        cycle1, cycle2 = get_random_cycle(len(matrix2)) 
+        d = call_search(matrix2, d, cycle1, cycle2,1)
+        print(f'{_}|', end='')
+    print('\n=============================================')
+    for k in d.keys():
+        d[k][0][0] /= ITER
+        d[k][1][0] /= ITER
+        d[k][0][3] /= ITER
+        d[k][1][3] /= ITER
+        
+        for i in range(6): #zaokrąglanie wyników
+            d[k][0][i] = np.round(d[k][0][i],2)
+            d[k][1][i] = np.round(d[k][1][i],2)
+            
+        plot_result(instance1,*d[k][0][6], k)
+        plot_result(instance2,*d[k][1][6], k)
+        
+        del d[k][0][6]
+        del d[k][1][6]
+    
+    res = pd.DataFrame(data=d, index=('kroa200', 'krob200'))
+    res.to_csv('result_MSLS.csv')
+    print(res)
+    
+    
 if __name__ == "__main__":
     # GRID SEARCH
     # ray.init()
@@ -188,13 +246,16 @@ if __name__ == "__main__":
     #     print(a)
     #     print()
 
-    ka200_instance = load_instance('../data/kroa200.tsp')
-    kb200_instance = load_instance('../data/krob200.tsp')
+    ka200_instance = load_instance('./data/kroa200.tsp')
+    kb200_instance = load_instance('./data/krob200.tsp')
 
     ka200_dm = calc_distance_matrix(ka200_instance)
     kb200_dm = calc_distance_matrix(kb200_instance)
 
-    results = {'score': ([None], [None]), 'time': ([None], [None])}
+    #MLS
+    # test_random_start(ka200_instance,kb200_instance,ka200_dm,kb200_dm)
+    
+    results = {'score': ([31858.7, 31514, 3233], [31880.2, 31703, 32390]), 'time': ([487.58, 428.57, 524.06], [514.62, 446.94, 586.74])}
     # Zamiast None trzeba wrzucić wyniki z MSLS i ustawić MSLS_MEAN_TIME na średni czas wykonywania
 
     str_alg = ('MSLS', 'ILS1', 'ILS2', 'ILS2a')
@@ -206,6 +267,8 @@ if __name__ == "__main__":
     params_lga = {'p': lg_perturb, 'size': 0.3, 'rand': 0.99,
                   'stop_time': MSLS_MEAN_TIME, 'regret_begin': True}
 
-    results = test_report_wrapper(results, str_alg[1:], [IteratedLS, IteratedLS, IteratedLSa], [ka200_dm, kb200_dm],
-                                  [ka200_instance, kb200_instance], [params_sm, params_lg, params_lga])
+    results = test_report_wrapper(results, str_alg[1:], [IteratedLS, IteratedLS, IteratedLSa], [kb200_dm,ka200_dm],
+                                  [kb200_instance,ka200_instance], [params_sm, params_lg, params_lga])
     print_results(results, str_alg)
+
+
