@@ -13,6 +13,8 @@
 ### LAB 4
 [Rozszerzenia lokalnego przeszukiwania](local_search_3/)
 
+### LAB 5
+[Hybrydowy Algorytm Ewolucyjny](genetic_local_search/)
 
 
 [COLAB](https://colab.research.google.com/drive/1p0_KqZCCuiNlxChvjjTE3MRt-E2dEitz?usp=sharing)
