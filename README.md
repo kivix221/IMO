@@ -16,5 +16,7 @@
 ### LAB 5
 [Hybrydowy Algorytm Ewolucyjny](genetic_local_search/)
 
+### LAB 7
+[Ulepszenie lokalnego przeszukiwania](local_search_3/better_ils.py)
 
 [COLAB](https://colab.research.google.com/drive/1p0_KqZCCuiNlxChvjjTE3MRt-E2dEitz?usp=sharing)
