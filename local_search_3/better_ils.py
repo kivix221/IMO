@@ -458,20 +458,21 @@ def perturb(cycle1, cycle2, size, matrix):
 #         return c1, c2
 
 
-@ray.remote
+@ray.remote(num_cpus=1)
 class ASet:
     def __init__(self):
-        self.been = set()
+        self.been = np.zeros((10000,), dtype=np.bool_)
 
     async def check_score(self, t: int):
-        if t in self.been:
+        nt = t - 28000
+        if self.been[nt]:
             return True
         else:
-            self.been.add(t)
+            self.been[nt] = True
             return False
 
     async def add_score(self, t: int):
-        self.been.add(t)
+        self.been[t - 28000] = True
 
 
 @njit
@@ -488,7 +489,7 @@ def _ls_begin(matrix, candidates, n):
 
 # @njit
 @ray.remote
-def run_algo(size, matrix, candidates, stop_time=1.5, regret_begin=False, n=200):
+def run_algo(size, matrix, candidates, been, stop_time=1.5, regret_begin=False, n=200):
     iteration = 0
     found = 0
     # with objmode(t='f8'):
@@ -501,6 +502,8 @@ def run_algo(size, matrix, candidates, stop_time=1.5, regret_begin=False, n=200)
         c1, c2, _ = _ls_begin(matrix, candidates, n)
     best_c1, best_c2 = c1, c2
     best_d = get_cycles_distance(matrix, best_c1, best_c2)[0]
+    if best_d < 38000:
+        ray.wait([been.add_score.remote(int(best_d))])
 
     while t_dur < stop_time:
         iteration += 1
@@ -509,21 +512,32 @@ def run_algo(size, matrix, candidates, stop_time=1.5, regret_begin=False, n=200)
         nc1, nc2, d = steep_candidates(matrix, nc1, nc2, candidates,
                                        is_in_cycle(n, nc1, nc2))
 
-        if delt + d < 0:
-            found += 1
-            best_d += delt + d
-            best_c1, best_c2 = nc1, nc2
+        new_d = best_d + delt + d
+        if new_d < best_d:
+            if new_d < 38000:
+                if ray.get(been.check_score.remote(int(new_d))):
+                    if new_d < 30000 and size < 20:
+                        size += 1
+                else:
+                    found += 1
+                    best_d = new_d
+                    best_c1, best_c2 = nc1, nc2
+            else:
+                found += 1
+                best_d = new_d
+                best_c1, best_c2 = nc1, nc2
 
         # with objmode(tk='f8'):
         tk = time()
         t_dur = tk - t
 
+    # print(size)
     return (best_c1, best_c2), (found / iteration, iteration), best_d
 
 
 @ray.remote
-def _run_parallel(size, matrix, candidates, stop_time=1.5, regret_begin=False, n=200):
-    return run_algo(size, matrix, candidates, stop_time, regret_begin, n)
+def _run_parallel(size, matrix, candidates, been, stop_time=1.5, regret_begin=False, n=200):
+    return run_algo(size, matrix, candidates, been, stop_time, regret_begin, n)
 
 
 @njit
@@ -543,8 +557,8 @@ def calc_from_results(results, matrix: np.ndarray):
     return results[si][0], (float(z) / w, w), results[si][2]
 
 
-def run_parallel(size, matrix, candidates, stop_time=1.5, regret_begin=False, n=200):
-    results = [run_algo.remote(size, matrix, candidates, stop_time, regret_begin, n) for _ in range(4)]
+def run_parallel(size, matrix, candidates, been, stop_time=1.5, regret_begin=False, n=200):
+    results = [run_algo.remote(size, matrix, candidates, been, stop_time-7, regret_begin, n) for _ in range(4)]
     results = ray.get(results)
     return calc_from_results(results, matrix)
 
@@ -564,9 +578,9 @@ if __name__ == "__main__":
     ray.init()
     data = []
     cycy = []
-    aset = ASet.remote()
+    aset = ASet.options(max_concurrency=1).remote()
     for _ in tqdm(range(10)):
-        (cy1, cy2), _, best = run_parallel(7, ka200_dm, candidates_ka, stop_time=150,
+        (cy1, cy2), _, best = run_parallel(7, kb200_dm, candidates_kb, aset, stop_time=150,
                                            regret_begin=True)  # , rand=1.0, instance=kb200_instance)
         # dist = get_cycles_distance(kb200_dm, cy1, cy2)
         # if dist[0] != best:
@@ -588,7 +602,7 @@ if __name__ == "__main__":
     # b[0] = np.fromfile('../../c1_kb_29714.csv', dtype=np.int64, sep='\n')
     # b[1] = np.fromfile('../../c2_kb_29714.csv', dtype=np.int64, sep='\n')
     # print(b[0].shape)
-    dist = get_cycles_distance(ka200_dm, b[0], b[1])
+    dist = get_cycles_distance(kb200_dm, b[0], b[1])
     # print(dist)
     # plot_result(kb200_instance, b[0], b[1], str(dist[0]))
-    plot_result(ka200_instance, b[0], b[1], str(dist[0]))
+    plot_result(kb200_instance, b[0], b[1], str(dist[0]))
