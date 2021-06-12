@@ -1,6 +1,9 @@
 import random
 from time import time
 from random import randrange
+
+import numpy as np
+from tqdm import tqdm
 try:
     from .algo import Algorithm
     from ..utils import *
@@ -218,11 +221,25 @@ if __name__ == "__main__":
     ka200_dm = calc_distance_matrix(ka200_instance)
     kb200_dm = calc_distance_matrix(kb200_instance)
 
-    it = IteratedLS(kb200_dm)
+    it = IteratedLS(ka200_dm)
     s_per = SmallPerturbation()
     l_per = LargePerturbation()
-    cy1, cy2 = it.run(l_per, stop_time=15, size=0.2, rand=1.0, instance=kb200_instance)
+    data = []
+    cycy = []
+    for _ in tqdm(range(10)):
+        (cy1, cy2), _ = it.run(s_per, stop_time=150, size=7, regret_begin=True)  # , rand=1.0, instance=kb200_instance)
+        dist = get_cycles_distance(ka200_dm, cy1, cy2)
+        data.append((dist[0], *_))
+        cycy.append((cy1, cy2))
+    data = np.array(data)
+    print("maxy:")
+    print(np.max(data, axis=0), np.max(data, axis=1))
+    print("meany:")
+    print(np.mean(data, axis=0), np.mean(data, axis=1))
+    print("miny:")
+    print(np.min(data, axis=0), np.min(data, axis=1))
 
-    dist = get_cycles_distance(kb200_dm, cy1, cy2)
-    print(get_cycles_distance(kb200_dm, cy1, cy2))
-    plot_result(kb200_instance, cy1, cy2, str(dist[0]))
+    b = cycy[np.argmin(data[:, 0])]
+
+    print(get_cycles_distance(ka200_dm, cy1, cy2))
+    plot_result(ka200_instance, b[0], b[1], str(np.min(data[:, 0])))
