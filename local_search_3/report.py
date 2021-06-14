@@ -117,7 +117,7 @@ def run_report(algo: Algorithm.__class__, matrix, instance, params):
     s, t, bc = [], [], []
     for i in tqdm(range(ITER)):
         st = time()
-        (c1, c2), _ = algo.run(**params)
+        (c1, c2), _ = algo.run_algo(**params)
         st = time() - st
         s.append(get_cycles_distance(matrix, c1, c2)[0])
         t.append(st)
