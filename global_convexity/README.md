@@ -1,0 +1,1 @@
+# IMO 6 Testy globalnej wypukłości

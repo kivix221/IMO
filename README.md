@@ -16,6 +16,8 @@
 ### LAB 5
 [Hybrydowy Algorytm Ewolucyjny](genetic_local_search/)
 
+### LAB 6
+[Testy globalnej wypukłości](global_convexity/)
 ### LAB 7
 [Ulepszenie lokalnego przeszukiwania](local_search_3/better_ils.py)
 
